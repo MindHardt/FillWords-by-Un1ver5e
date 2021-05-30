@@ -5,14 +5,32 @@ namespace FillWords.Consos
 {
     static class Program
     {
-        public static Screen ActiveScreen { get; private set; }
+        public static Screen ActiveScreen
+        {
+            get
+            {
+                return acs;
+            }
+            set
+            {
+                acs = value;
+                Console.Clear();
+            }
+        }
+        private static Screen acs;
 
         static void Main(string[] args)
         {
+            Console.Title = "FillWords by Un1ver5e";
             Console.CursorVisible = false;
-            Console.WindowHeight = Console.LargestWindowHeight;
-            Console.WindowWidth = Console.LargestWindowWidth;
-
+            ActiveScreen = Screen.MainScreen;
+            while (true)
+            {
+                ActiveScreen.Display();
+                var CK = Console.ReadKey(true).Key;
+                ActiveScreen.KeyAction(CK);
+                
+            }
         }
     }
 }
