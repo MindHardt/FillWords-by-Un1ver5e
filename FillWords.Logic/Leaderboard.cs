@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace FillWords.Logic
 {
@@ -10,22 +11,25 @@ namespace FillWords.Logic
         public static string Path = Environment.CurrentDirectory;
         public static Random Randomizer = new Random();
     }
-    class User
+    public class User
     {
         public static List<User> LoadedUsers;
 
-        public readonly string Name;
-        public int Score { get; private set; }
 
-        public User(string name, int score)
+        public readonly string Name;
+        public int Score { get; private set; } = 0;
+
+
+        private User(string name, int score)
         {
             Name = name;
             Score = score;
         }
-        public void AddScore(Game.Field.Word word)
-        {
-            Score += word.Length;
-        }
+        public User(string name) => Name = name;
+
+
+        public void AddScore(int score) => Score += score;
+
         public static void LoadLeaderboard()
         {
             LoadedUsers = new List<User>();
@@ -36,7 +40,17 @@ namespace FillWords.Logic
                 string[] parts = s.Split(',');
                 LoadedUsers.Add(new User(parts[0], int.Parse(parts[1])));
             }
-            return;
+            LoadedUsers = LoadedUsers.OrderByDescending(u => u.Score).ThenBy(u => u.Name).ToList();
+        }
+        public static void SaveLeaderboard()
+        {
+            LoadedUsers = LoadedUsers.OrderByDescending(u => u.Score).ThenBy(u => u.Name).ToList();
+            string[] userStrings = new string[LoadedUsers.Count];
+            for (int i = 0; i < userStrings.Length; i++)
+            {
+                userStrings[i] = LoadedUsers[i].Name + "," + LoadedUsers[i].Score;
+            }
+            File.WriteAllLines(Data.Path + "\\Leaderboard.csv", userStrings);
         }
     }
 }
