@@ -18,6 +18,7 @@ namespace FillWords.Consos
             }
         }
         private static Screen acs;
+        public static User ActiveUser;
 
         static void Main(string[] args)
         {

@@ -10,14 +10,14 @@ namespace FillWords.Logic
         public static string Path = Environment.CurrentDirectory;
         public static Random Randomizer = new Random();
     }
-    class User
+    public class User
     {
         public static List<User> LoadedUsers;
 
         public readonly string Name;
         public int Score { get; private set; }
 
-        public User(string name, int score)
+        public User(string name, int score = 0)
         {
             Name = name;
             Score = score;

@@ -29,6 +29,7 @@ namespace FillWords.Consos
         private Button[] buttons;
         public Action<ConsoleKey> KeyAction { get; }
 
+
         //ЭКЗЕМПЛЯРЫ ЭКРАНОВ
         public static Screen MainScreen = new Screen
             (
@@ -36,7 +37,7 @@ namespace FillWords.Consos
                 "FILLWORDS",
                 "by Un1ver5e",
                 "",
-                new Button("NEW GAME", () => Console.Beep()),
+                new Button("NEW GAME", () => Program.ActiveScreen = NewGameScreen),
                 "",
                 new Button("CONTINUE", () => Console.Beep()),
                 "",
@@ -44,18 +45,14 @@ namespace FillWords.Consos
                 "",
                 new Button("EXIT", () => Environment.Exit(0))
             },
-            (CK) => 
+            (CK) =>
             {
-                switch (CK) 
+                switch (CK)
                 {
                     case ConsoleKey.W:
                     case ConsoleKey.UpArrow: MainScreen.selectedRow--; break;
-                    case ConsoleKey.A:
-                    case ConsoleKey.LeftArrow: break;
                     case ConsoleKey.S:
                     case ConsoleKey.DownArrow: MainScreen.selectedRow++; break;
-                    case ConsoleKey.D:
-                    case ConsoleKey.RightArrow: break;
                     case ConsoleKey.Enter: MainScreen.selectedButton.action(); break;
                     default: break;
                 }
@@ -79,6 +76,58 @@ namespace FillWords.Consos
                 }
             }
             );
+        public static Screen NewGameScreen = new Screen
+            (
+            new object[]
+            {
+                "",
+                new Button("Type your nickname:", () =>
+                {
+                    try 
+                    {
+                        ReadNickname();
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.ActiveScreen = BadNameScreen;
+                    }
+                }),
+                "",
+                new Button("Back", () => Program.ActiveScreen = MainScreen)
+            },
+            (CK) =>
+            {
+                switch (CK)
+                {
+                    case ConsoleKey.W:
+                    case ConsoleKey.UpArrow: NewGameScreen.selectedRow--; break;
+                    case ConsoleKey.S:
+                    case ConsoleKey.DownArrow: NewGameScreen.selectedRow++; break;
+                    case ConsoleKey.Enter: NewGameScreen.selectedButton.action(); break;
+                    default: break;
+                }
+}
+            );
+        public static Screen BadNameScreen = new Screen
+            (
+            new object[]
+            {
+                "Nickname is too long or contains forbidden symbol \",\"",
+                "",
+                new Button("Ok", () => Program.ActiveScreen = NewGameScreen)
+            },
+            (CK) =>
+            {
+                switch (CK)
+                {
+                    case ConsoleKey.Enter: BadNameScreen.selectedButton.action(); break;
+                    default: break;
+                }
+            }
+            );
+
+
+
         private Screen(object[] items, Action<ConsoleKey> keyAction)
         {
             contents = items;
@@ -134,6 +183,13 @@ namespace FillWords.Consos
                 userStrings[i] = i + 1 + ". " + User.LoadedUsers[i].Name + new string('.', Console.WindowWidth - l - 2) + User.LoadedUsers[i].Score;
             }
             return userStrings;
+        }
+        private static void ReadNickname()
+        {
+            string nickname = Console.ReadLine();
+            if (nickname.Contains(',') || nickname.Length > 16) throw new Exception("Bad Nickname");
+            Program.ActiveUser = new User(nickname);
+            User.LoadedUsers.Add(Program.ActiveUser);
         }
     }
     internal static class ArrayStringExtension
